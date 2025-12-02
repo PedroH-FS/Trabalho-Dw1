@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Lista de Tarefas</title>
+
+<style>
+    body {
+        background: #eaf7ea;
+        font-family: Arial, sans-serif;
+        padding: 40px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #2e8b57;
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 14px;
+        border-left: 8px solid #2e8b57;
+        box-shadow: 0px 4px 14px rgba(0,0,0,0.15);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    th {
+        background: #2e8b57;
+        color: white;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 6px 6px 0 0;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #d3e8d3;
+    }
+
+    tr:nth-child(even) {
+        background: #f4fcf4;
+    }
+
+    tr:hover {
+        background: #e4f5e4;
+        transition: 0.2s;
+    }
+
+    .urgente {
+        color: red !important;
+        font-weight: bold;
+        background: #ffe5e5 !important;
+    }
+
+    .msg {
+        text-align: center;
+        padding: 40px;
+        font-size: 18px;
+        color: #2e8b57;
+    }
+</style>
+</head>
+
+<body onload="atualizar()">
+
+<h2>Lista de Tarefas</h2>
+
+<div class="container">
+    <div id="lista"></div>
+</div>
+
+<script>
+const urlBase = "http://159.65.228.63/tarefas";
+let dados = [];
+
+async function atualizar() {
+    const response = await fetch(urlBase);
+    dados = await response.json();
+    criarTabela();
+}
+
+function criarTabela() {
+    const div = document.getElementById("lista");
+    div.innerHTML = "";
+
+    if (dados.length === 0) {
+        div.innerHTML = "<div class='msg'>Nenhuma tarefa cadastrada</div>";
+        return;
+    }
+
+    const table = document.createElement("table");
+
+    const header = document.createElement("tr");
+    header.innerHTML = `
+        <th>ID</th>
+        <th>Prioridade</th>
+        <th>Descrição</th>
+        <th>Local</th>
+        <th>Recursos</th>
+        <th>Data Limite</th>
+        <th>Matrícula</th>
+    `;
+    table.appendChild(header);
+
+    dados.forEach(tarefa => {
+        const tr = document.createElement("tr");
+
+        if (tarefa.prioridade === "Urgente") {
+            tr.classList.add("urgente");
+        }
+
+        tr.innerHTML = `
+            <td>${tarefa.id}</td>
+            <td>${tarefa.prioridade}</td>
+            <td>${tarefa.descricao}</td>
+            <td>${tarefa.local}</td>
+            <td>${tarefa.recursosNecessarios.join(", ")}</td>
+            <td>${tarefa.dataLimite}</td>
+            <td>${tarefa.matricula}</td>
+        `;
+
+        table.appendChild(tr);
+    });
+
+    div.appendChild(table);
+}
+</script>
+
+</body>
+</html>
